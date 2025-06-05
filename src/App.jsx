@@ -71,7 +71,7 @@ const App = ({ totalPoints, fetchUserPoints }) => {
           />
         </div> */}
       </div>
-      <div id="luggage" name="luggage" className="absolute bottom-0">
+      <div id="luggage" name="luggage" style={{ position: 'absolute', bottom: 0 }}>
         <Luggage
           stopCoin={stopCoin}
           rewardCoin={rewardCoin}
