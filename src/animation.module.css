@@ -1,0 +1,242 @@
+/* SPINNING LEFT TO RIGHT */
+.spinWrapper {
+  animation: spin 5s linear infinite;
+  display: inline-block;
+  transform-origin: center;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* SCANNER RIGHT TO LEFT */
+.scanArea {
+  position: relative;
+  width: 100vw;
+  height: 50vh;
+  background-image: url("./image/Points_Bonus_BG_Sky.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: 2px solid #000;
+}
+
+.logoGame {
+  position: relative;
+  width: 350px;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -70%);
+  background-image: url("./image/Points_Bonus_Logo.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 0;
+}
+
+.scanFrame {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 35%);
+  width: 300px;
+  height: 100%;
+  background-image: url("./image/Points_Bonus_Airport_security.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.luggageBelt {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 35%);
+  width: 100vw;
+  height: 100px;
+  background-image: url("./image/Points_Bonus_Luggage_belt.png");
+  background-size: contain;
+  animation: luggageBelt 10s linear infinite;
+  background-position: center;
+  z-index: 1;
+}
+
+.luggageBeltPaused {
+  animation-play-state: paused !important;
+}
+
+
+.scanLaser {
+  animation: revealCoinWithLaser 3s linear infinite;
+
+  clip-path: inset(100% 0 0 0);
+  z-index: 3;
+  /* background-color: rgb(172, 221, 25); */
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 140px;
+  overflow: hidden;
+  background-image: url("./image/Points_Bonus_Scan.png");
+  background-size: contain;
+  background-position: center top;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.windowGame {
+  position: absolute;
+  top: 0;
+  width: 100vw;
+  height: 50vh;
+  background-image: url("./image/Points_Bonus_BG_Window.png");
+  background-size: contain;
+  background-position: center;
+  z-index: 0;
+}
+
+.luggageWrapper {
+  position: relative;
+  overflow: hidden;
+  width: 100vw;
+  height: 255px;
+  z-index: 1;
+}
+
+.luggageItem {
+  width: 250px;
+  height: 250px;
+  position: absolute;
+  flex-shrink: 0;
+  transition: left 0.05s linear;
+}
+
+.luggageTrack {
+  display: flex;
+  width: max-content;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.imageLuggage {
+  width: 350px;
+  height: 250px;
+}
+
+.imageCoin {
+  width: 120px;
+  height: 120px;
+}
+
+.widthCoin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -85%);
+  /* background-color: aqua; */
+  width: 155px;
+  height: 120px;
+  overflow: hidden;
+}
+
+.coinOverlay {
+  position: absolute;
+  top: 50%;
+  left: 0; /* จาก 50% เป็น 0 */
+  transform: translate(0, -50%); /* จาก (-55%, -50%) เป็น (0, -50%) */
+  width: 100vw;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.coinAbsolute {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  /* ลบ transform X ทิ้ง */
+  transition: transform 0.3s ease;
+}
+
+@keyframes luggageBelt {
+  0% {
+    background-position: 0 center;
+  }
+  100% {
+    background-position: -100vw center;
+  }
+}
+
+@keyframes scanCoinOnBag {
+  0% {
+    clip-path: inset(100% 0 0 0);
+  }
+  50% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+
+@keyframes revealCoinWithLaser {
+  0% {
+    clip-path: inset(90% 0 0 0);
+    background-position: center 102%;
+  }
+  25% {
+    clip-path: inset(42% 0 0 0);
+    background-position: center 42%;
+  }
+  50% {
+    clip-path: inset(0% 0 0 0);
+    background-position: center 0%;
+  }
+  75% {
+    clip-path: inset(42% 0 0 0);
+    background-position: center 42%;
+  }
+  100% {
+    clip-path: inset(90% 0 0 0);
+    background-position: center 102%;
+  }
+}
+
+/* BUTTON CLICK */
+.wrapperButtonStop {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.buttonStop {
+  width: 100px;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+.buttonStopDisabled {
+  width: 100px;
+  height: auto;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* BUTTON POSITIONING */
+.buttonPosition {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 85%);
+  z-index: 3;
+}
