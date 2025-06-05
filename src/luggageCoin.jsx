@@ -24,6 +24,9 @@ const CoinAnimation = ({
   const speedRef = useRef(2);
   const hasStoppedRef = useRef(false);
 
+  // ตัวแปรเก็บจำนวนครั้งที่ผ่านเป้าหมาย
+  const targetHitCountRef = useRef(0);
+
   const baseBags = Array.from({ length: 18 }).map((_, i) => {
     const type = i % 3;
     return {
@@ -78,7 +81,7 @@ const CoinAnimation = ({
       return {
         ...bag,
         left,
-        coinLeft: left + (250 / 2) - (coinWidth / 2) + 45,
+        coinLeft: left + 250 / 2 - coinWidth / 2 + 45,
         visible,
       };
     });
@@ -123,6 +126,9 @@ const CoinAnimation = ({
     const gap = 60;
     const totalWidth = (itemWidth + gap) * baseBags.length;
 
+    // อัพเดตตำแหน่งครั้งแรกก่อนเริ่มแอนิเมชัน
+    updateVisible(currentOffsetRef.current);
+
     const animate = () => {
       let offset = currentOffsetRef.current + speedRef.current;
       if (offset >= totalWidth) offset -= totalWidth;
@@ -131,11 +137,7 @@ const CoinAnimation = ({
 
       if (isStopping) {
         const targetIdx = getTargetIndex();
-
-        // คำนวณตำแหน่งเป้าหมายจริงแบบแม่นยำด้วย DOM
         const targetX = (itemWidth + gap) * targetIdx;
-
-        // คำนวณ centerOffset โดยใช้ขนาดจริงของ container
         const wrapperRect = wrapper.getBoundingClientRect();
         const centerOffset = offset + wrapperRect.width / 2 - itemWidth / 2;
 
@@ -157,11 +159,10 @@ const CoinAnimation = ({
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    hasStoppedRef.current = false;
     animationRef.current = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(animationRef.current);
-  }, [stopCoin, rewardCoin, isStopping, coinPositions]); // เพิ่ม coinPositions เพื่อให้ getTargetIndex ใช้ข้อมูลล่าสุด
+  }, [stopCoin, rewardCoin, isStopping]);
 
   // อัพเดตตำแหน่งเมื่อหน้าจอเปลี่ยนขนาด
   useEffect(() => {
