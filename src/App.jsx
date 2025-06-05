@@ -22,7 +22,7 @@ const App = ({ totalPoints, fetchUserPoints }) => {
     if (points !== undefined) {
       setRewardCoin(points);
     }
-    onLuggageStoppedCallback.current = showModalCallback;
+    // onLuggageStoppedCallback.current = showModalCallback;
     setStopCoin(true);
   };
 
@@ -64,14 +64,17 @@ const App = ({ totalPoints, fetchUserPoints }) => {
             </div>
           </div>
         </div>
-        {/* <div className={styles.buttonPosition}>
-          <ButtonAction
-            totalPoints={totalPoints}
-            onRewardModalClose={handleButtonClick}
-          />
-        </div> */}
+        <div className={styles.buttonPosition}>
+          <button totalPoints={9} onClick={handleButtonClick}>
+            click
+          </button>
+        </div>
       </div>
-      <div id="luggage" name="luggage" style={{ position: 'absolute', bottom: 0 }}>
+      <div
+        id="luggage"
+        name="luggage"
+        style={{ position: "absolute", bottom: 0 }}
+      >
         <Luggage
           stopCoin={stopCoin}
           rewardCoin={rewardCoin}
