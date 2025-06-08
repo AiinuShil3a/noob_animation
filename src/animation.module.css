@@ -18,12 +18,19 @@
 .scanArea {
   position: relative;
   width: 100vw;
-  height: 50vh;
+  height: 500px;
   background-image: url("./image/Points_Bonus_BG_Sky.png");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
   border: 2px solid #000;
+}
+
+.planeArea {
+  position: relative;
+  width: 100vw;
+  height: 500px;
+  overflow: hidden;
 }
 
 .logoGame {
@@ -76,7 +83,6 @@
 
 .scanLaser {
   animation: revealCoinWithLaser 3s linear infinite;
-
   clip-path: inset(100% 0 0 0);
   z-index: 3;
   /* background-color: rgb(172, 221, 25); */
@@ -98,11 +104,11 @@
   position: absolute;
   top: 0;
   width: 100vw;
-  height: 50vh;
+  height: 500px;
   background-image: url("./image/Points_Bonus_BG_Window.png");
   background-size: contain;
   background-position: center;
-  z-index: 0;
+  z-index: 1;
 }
 
 .luggageWrapper {
@@ -133,13 +139,9 @@
   height: 250px;
 }
 
-.imageCoin {
-  width: 120px;
-  height: 120px;
-}
 
 .widthCoin {
-  position: absolute;
+  position: relative;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -85%);
@@ -152,8 +154,8 @@
 .coinOverlay {
   position: absolute;
   top: 50%;
-  left: 0; /* จาก 50% เป็น 0 */
-  transform: translate(0, -50%); /* จาก (-55%, -50%) เป็น (0, -50%) */
+  left: 50%; 
+  transform: translate(-50%, -50%);
   width: 100vw;
   height: 100%;
   pointer-events: none;
@@ -168,6 +170,38 @@
   /* ลบ transform X ทิ้ง */
   transition: transform 0.3s ease;
 }
+
+.coinItem {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.planeFlying {
+  animation: plane 10s linear infinite;
+  position: absolute;
+  top: 80%;
+  left: -100px; /* เริ่มซ้ายล่างออกจอเล็กน้อย */
+  width: 100px;
+  height: 100px;
+  background-image: url("./image/Points_Bonus_Plane.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+
+@keyframes plane {
+  from {
+    transform: translate(0, 0)
+  }
+  to {
+    transform: translate(calc(300vw + 100px), calc(-100vh - 100px))
+  }
+}
+
 
 @keyframes luggageBelt {
   0% {
@@ -237,6 +271,6 @@
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, 85%);
+  transform: translate(-50%, 70%);
   z-index: 3;
 }

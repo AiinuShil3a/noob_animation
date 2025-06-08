@@ -1,9 +1,15 @@
 import React, { useState, useRef } from "react";
 import Luggage from "./luggageCoin";
 import styles from "./animation.module.css";
-// import ButtonAction from "../animation_button_click/buttonAction";
 
-const App = ({ totalPoints, fetchUserPoints }) => {
+const CoinAnimation = ({
+  totalPoints,
+  fetchUserPoints,
+  setPointAction,
+  setFunctionModal,
+  setShowModalMain,
+  setNextDateClaim,
+}) => {
   const [rewardCoin, setRewardCoin] = useState(0);
   const [stopCoin, setStopCoin] = useState(false);
   const onLuggageStoppedCallback = useRef(null);
@@ -20,9 +26,9 @@ const App = ({ totalPoints, fetchUserPoints }) => {
 
   const handleButtonClick = (points, showModalCallback) => {
     if (points !== undefined) {
-      setRewardCoin(points);
+      setRewardCoin(8);
     }
-    // onLuggageStoppedCallback.current = showModalCallback;
+    onLuggageStoppedCallback.current = showModalCallback;
     setStopCoin(true);
   };
 
@@ -32,6 +38,9 @@ const App = ({ totalPoints, fetchUserPoints }) => {
 
   return (
     <div className={styles.scanArea}>
+      <div className={styles.planeArea}>
+        <div className={styles.planeFlying} />
+      </div>
       <div className={styles.windowGame}>
         <div className={styles.logoGame} />
       </div>
@@ -54,7 +63,6 @@ const App = ({ totalPoints, fetchUserPoints }) => {
                 >
                   <img
                     src={coinData.coin.src ?? coinData.coin}
-                    // className={styles.imageCoin}
                     width={100}
                     height={100}
                     alt="Coin"
@@ -65,6 +73,14 @@ const App = ({ totalPoints, fetchUserPoints }) => {
           </div>
         </div>
         <div className={styles.buttonPosition}>
+          {/* <ButtonAction
+            totalPoints={totalPoints}
+            onRewardModalClose={handleButtonClick}
+            setPointAction={setPointAction}
+            setFunctionModal={setFunctionModal}
+            setShowModalMain={setShowModalMain}
+            setNextDateClaim={setNextDateClaim}
+          /> */}
           <button totalPoints={9} onClick={handleButtonClick}>
             click
           </button>
@@ -86,4 +102,4 @@ const App = ({ totalPoints, fetchUserPoints }) => {
   );
 };
 
-export default App;
+export default CoinAnimation;

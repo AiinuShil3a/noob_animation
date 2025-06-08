@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 
 import Coin from "./image/Points_Bonus_Points.png";
 import CoinJar from "./image/Points_Bonus_Points_Jar.png";
@@ -23,99 +23,104 @@ const CoinAnimation = ({
   const currentOffsetRef = useRef(0);
   const speedRef = useRef(2);
   const hasStoppedRef = useRef(false);
+  const stopOffsetRef = useRef(null);
 
-  // ตัวแปรเก็บจำนวนครั้งที่ผ่านเป้าหมาย
-  const targetHitCountRef = useRef(0);
+  const baseBags = useMemo(() => {
+    return Array.from({ length: 18 }).map((_, i) => {
+      const type = i % 3;
+      const coinType = type === 0 ? "normal" : type === 1 ? "jar" : "bag";
+      return {
+        luggage:
+          type === 0 ? Luggage_Green : type === 1 ? Luggage_Yellow : Luggage_Sky,
+        coin: type === 0 ? Coin : type === 1 ? CoinJar : CoinBag,
+        type: coinType,
+        key: i,
+      };
+    });
+  }, []);
 
-  const baseBags = Array.from({ length: 18 }).map((_, i) => {
-    const type = i % 3;
-    return {
-      luggage:
-        type === 0 ? Luggage_Green : type === 1 ? Luggage_Yellow : Luggage_Sky,
-      coin: type === 0 ? Coin : type === 1 ? CoinJar : CoinBag,
-      key: i,
-    };
-  });
-
-  const getCoinType = (coin) => {
-    if (coin === CoinBag) return "bag";
-    if (coin === CoinJar) return "jar";
-    return "normal";
-  };
-
-  const matchRewardCoin = (reward) => {
+  const matchRewardCoin = useCallback((reward) => {
     if (reward >= 8) return "bag";
-    if (reward >= 6) return "jar";
-    if (reward >= 1) return "normal";
+    if (reward >= 6 && reward <= 7) return "jar";
+    if (reward >= 1 && reward <= 5) return "normal";
     return null;
-  };
+  }, []);
 
-  // Update coin positions on screen (ตำแหน่งกระเป๋าและเหรียญ)
-  const updateVisible = (offsetX) => {
+  const updateVisible = useCallback(
+    (offsetX) => {
+      const wrapper = containerRef.current;
+      if (!wrapper) return;
+
+      const itemElem = wrapper.querySelector(`.${styles.luggageItem}`);
+      const itemWidth = itemElem?.offsetWidth || 150;
+      const gap = 60;
+      const totalWidth = (itemWidth + gap) * baseBags.length;
+      const containerWidth = wrapper.offsetWidth;
+
+      const center = containerWidth / 2;
+      const scan = containerWidth * 0.15;
+      const start = center - scan / 2;
+      const end = center + scan / 2;
+
+      const newPositions = baseBags.map((bag, i) => {
+        let left = (itemWidth + gap) * i - offsetX;
+        if (left + itemWidth < -50) {
+          left += totalWidth;
+        } else if (left > containerWidth) {
+          left -= totalWidth;
+        }
+
+        const centerPos = left + itemWidth - 180;
+        const visible = centerPos >= start && centerPos <= end;
+
+        return {
+          ...bag,
+          left,
+          coinLeft: centerPos,
+          visible,
+        };
+      });
+
+      setCoinPositions(newPositions);
+      if (onCoinUpdate) onCoinUpdate(newPositions);
+    },
+    [baseBags, onCoinUpdate]
+  );
+
+  const getTargetStopOffset = useCallback(() => {
     const wrapper = containerRef.current;
-    if (!wrapper) return;
+    if (!wrapper) return null;
 
     const itemElem = wrapper.querySelector(`.${styles.luggageItem}`);
     const itemWidth = itemElem?.offsetWidth || 150;
     const gap = 60;
     const totalWidth = (itemWidth + gap) * baseBags.length;
-    const containerWidth = wrapper.offsetWidth;
-
-    const coinWidth = 100;
-    const center = containerWidth / 2;
-    const scan = containerWidth * 0.15;
-    const start = center - scan / 2;
-    const end = center + scan / 2;
-
-    const newPositions = baseBags.map((bag, i) => {
-      let left = (itemWidth + gap) * i - offsetX;
-      if (left + itemWidth < -50) {
-        left += totalWidth;
-      } else if (left > containerWidth) {
-        left -= totalWidth;
-      }
-
-      const centerPos = left + itemWidth / 2;
-      const visible = centerPos >= start && centerPos <= end;
-
-      return {
-        ...bag,
-        left,
-        coinLeft: left + 250 / 2 - coinWidth / 2 + 45,
-        visible,
-      };
-    });
-
-    setCoinPositions(newPositions);
-    if (onCoinUpdate) onCoinUpdate(newPositions);
-  };
-
-  // หา index เป้าหมายเหรียญที่อยู่ใกล้กลางที่สุดและตรงกับ reward
-  const getTargetIndex = () => {
-    const wrapper = containerRef.current;
-    if (!wrapper) return 0;
-
-    const itemElem = wrapper.querySelector(`.${styles.luggageItem}`);
-    const itemWidth = itemElem?.offsetWidth || 150;
-    const gap = 60;
-
     const type = matchRewardCoin(rewardCoin);
-    const centerX = wrapper.getBoundingClientRect().width / 2;
 
-    let minDiff = Infinity;
-    let targetIdx = 0;
+    const currentOffset = currentOffsetRef.current;
+    const wrapperWidth = wrapper.getBoundingClientRect().width;
+    const center = wrapperWidth / 2 - itemWidth / 2;
 
-    coinPositions.forEach((bag, i) => {
-      const bagCenter = bag.left + itemWidth / 2;
-      const diff = Math.abs(bagCenter - centerX);
-      if (getCoinType(bag.coin) === type && diff < minDiff) {
-        minDiff = diff;
-        targetIdx = i;
-      }
+    const candidates = [];
+
+    baseBags.forEach((bag, i) => {
+      if (bag.type !== type) return;
+
+      const itemX = (itemWidth + gap) * i;
+      const distance = (itemX - center - currentOffset + totalWidth) % totalWidth;
+      const offset = (itemX - center + totalWidth) % totalWidth;
+
+      candidates.push({ index: i, offset, distance });
     });
 
-    return targetIdx;
-  };
+    if (candidates.length === 0) return null;
+
+    candidates.sort((a, b) => a.distance - b.distance);
+
+    const target = candidates[1] || candidates[0]; // ✅ ใช้เป้าหมายลำดับที่ 2
+
+    return target.offset;
+  }, [rewardCoin, baseBags, matchRewardCoin]);
 
   useEffect(() => {
     const wrapper = containerRef.current;
@@ -126,23 +131,19 @@ const CoinAnimation = ({
     const gap = 60;
     const totalWidth = (itemWidth + gap) * baseBags.length;
 
-    // อัพเดตตำแหน่งครั้งแรกก่อนเริ่มแอนิเมชัน
     updateVisible(currentOffsetRef.current);
 
     const animate = () => {
       let offset = currentOffsetRef.current + speedRef.current;
       if (offset >= totalWidth) offset -= totalWidth;
 
-      if (stopCoin && !isStopping) setIsStopping(true);
+      if (stopCoin && !isStopping) {
+        setIsStopping(true);
+        stopOffsetRef.current = getTargetStopOffset();
+      }
 
-      if (isStopping) {
-        const targetIdx = getTargetIndex();
-        const targetX = (itemWidth + gap) * targetIdx;
-        const wrapperRect = wrapper.getBoundingClientRect();
-        const centerOffset = offset + wrapperRect.width / 2 - itemWidth / 2;
-
-        let distance = targetX - centerOffset;
-        if (distance < 0) distance += totalWidth;
+      if (isStopping && stopOffsetRef.current !== null) {
+        const distance = (stopOffsetRef.current - offset + totalWidth) % totalWidth;
 
         speedRef.current = Math.max(distance / 50, 0.5);
 
@@ -163,16 +164,6 @@ const CoinAnimation = ({
 
     return () => cancelAnimationFrame(animationRef.current);
   }, [stopCoin, rewardCoin, isStopping]);
-
-  // อัพเดตตำแหน่งเมื่อหน้าจอเปลี่ยนขนาด
-  useEffect(() => {
-    const onResize = () => {
-      updateVisible(currentOffsetRef.current);
-    };
-
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
 
   return (
     <div className={styles.luggageWrapper} ref={containerRef}>
