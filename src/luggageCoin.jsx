@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 
 import Coin from "./image/Points_Bonus_Points.png";
 import CoinJar from "./image/Points_Bonus_Points_Jar.png";
@@ -31,7 +37,11 @@ const CoinAnimation = ({
       const coinType = type === 0 ? "normal" : type === 1 ? "jar" : "bag";
       return {
         luggage:
-          type === 0 ? Luggage_Green : type === 1 ? Luggage_Yellow : Luggage_Sky,
+          type === 0
+            ? Luggage_Green
+            : type === 1
+            ? Luggage_Yellow
+            : Luggage_Sky,
         coin: type === 0 ? Coin : type === 1 ? CoinJar : CoinBag,
         type: coinType,
         key: i,
@@ -63,10 +73,10 @@ const CoinAnimation = ({
       const end = center + scan / 2;
 
       const newPositions = baseBags.map((bag, i) => {
-        let left = (itemWidth + gap) * i - offsetX;
-        if (left + itemWidth < -50) {
+        let left = ((itemWidth + gap) * i - offsetX) % totalWidth;
+        if (left < -totalWidth / 2) {
           left += totalWidth;
-        } else if (left > containerWidth) {
+        } else if (left > totalWidth / 2) {
           left -= totalWidth;
         }
 
@@ -107,7 +117,8 @@ const CoinAnimation = ({
       if (bag.type !== type) return;
 
       const itemX = (itemWidth + gap) * i;
-      const distance = (itemX - center - currentOffset + totalWidth) % totalWidth;
+      const distance =
+        (itemX - center - currentOffset + totalWidth) % totalWidth;
       const offset = (itemX - center + totalWidth) % totalWidth;
 
       candidates.push({ index: i, offset, distance });
@@ -135,7 +146,7 @@ const CoinAnimation = ({
 
     const animate = () => {
       let offset = currentOffsetRef.current + speedRef.current;
-      if (offset >= totalWidth) offset -= totalWidth;
+      currentOffsetRef.current = offset; // ปล่อยให้วิ่งไปเรื่อย ๆ
 
       if (stopCoin && !isStopping) {
         setIsStopping(true);
@@ -143,7 +154,8 @@ const CoinAnimation = ({
       }
 
       if (isStopping && stopOffsetRef.current !== null) {
-        const distance = (stopOffsetRef.current - offset + totalWidth) % totalWidth;
+        const distance =
+          (stopOffsetRef.current - offset + totalWidth) % totalWidth;
 
         speedRef.current = Math.max(distance / 50, 0.5);
 
